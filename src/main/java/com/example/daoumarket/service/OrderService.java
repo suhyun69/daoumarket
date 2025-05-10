@@ -6,10 +6,13 @@ import com.example.daoumarket.dto.OrderResponse;
 import com.example.daoumarket.dto.OrderSummaryDto;
 import com.example.daoumarket.entity.*;
 import com.example.daoumarket.repository.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,4 +135,60 @@ public class OrderService {
         );
     }
 
+    public OrderDetailDto getOrderDetails(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        List<OrderDetailDto.OrderItemDto> items = order.getItems().stream()
+                .map(i -> new OrderDetailDto.OrderItemDto(
+                        i.getProduct().getName(),
+                        i.getOptionName(),
+                        i.getQuantity(),
+                        i.getUnitPrice(),
+                        i.getTotalPrice()
+                )).collect(Collectors.toList());
+
+        List<OrderDetailDto.AddonItemDto> addons = order.getAddonItems().stream()
+                .map(a -> new OrderDetailDto.AddonItemDto(
+                        a.getAddonName(),
+                        a.getQuantity(),
+                        a.getAddonPrice()
+                )).collect(Collectors.toList());
+
+        return new OrderDetailDto(
+                order.getId(),
+                items,
+                addons,
+                order.getTotalPrice(),
+                order.getCreatedAt()
+        );
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class OrderDetailDto {
+        private Long orderId;
+        private List<OrderItemDto> items;
+        private List<AddonItemDto> addons;
+        private int totalPrice;
+        private LocalDateTime createdAt;
+
+        @Data
+        @AllArgsConstructor
+        public static class OrderItemDto {
+            private String productName;
+            private String optionName;
+            private int quantity;
+            private int unitPrice;
+            private int totalPrice;
+        }
+
+        @Data
+        @AllArgsConstructor
+        public static class AddonItemDto {
+            private String addonName;
+            private int quantity;
+            private int price;
+        }
+    }
 }

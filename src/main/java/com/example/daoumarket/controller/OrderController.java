@@ -26,4 +26,10 @@ public class OrderController {
         return ResponseEntity.ok(orderService.summarizeOrder(request));
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<?> getOrderDetails(@PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.getOrderDetails(orderId));
+    }
+
+
 }
