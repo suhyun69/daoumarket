@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.daoumarket.service.OrderServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-05-10T13:57:40.198Z" hostname="bagsuhyeon-ui-MacBookAir.local" time="0.57">
+  <properties/>
+  <testcase name="testMissingOptionsThrowsException()" classname="com.example.daoumarket.service.OrderServiceTest" time="0.55"/>
+  <testcase name="testCreateOrderSuccess()" classname="com.example.daoumarket.service.OrderServiceTest" time="0.016"/>
+  <testcase name="testInvalidQuantityThrowsException()" classname="com.example.daoumarket.service.OrderServiceTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
