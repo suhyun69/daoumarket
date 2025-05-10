@@ -21,6 +21,17 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     public OrderResponse createOrder(OrderRequest req) {
+
+        // ✅ 수량 제한 (1~10)
+        if (req.getProductQuantity() < 1 || req.getProductQuantity() > 10) {
+            throw new IllegalArgumentException("수량은 1~10개 사이여야 합니다.");
+        }
+
+        // ✅ 옵션 선택 유무 확인
+        if (req.getSelectedOptions() == null || req.getSelectedOptions().isEmpty()) {
+            throw new IllegalArgumentException("옵션은 반드시 하나 이상 선택해야 합니다.");
+        }
+
         Product product = productRepository.findById(req.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -35,6 +46,7 @@ public class OrderService {
             optionSummary.append(option.getName()).append("/");
         }
 
+        // ✅ 상품 가격 = 기본 가격 + 옵션가
         int unitPrice = basePrice + optionPrice;
         int productTotal = unitPrice * req.getProductQuantity();
 
@@ -45,11 +57,15 @@ public class OrderService {
                     .orElseThrow(() -> new RuntimeException("Invalid addon: " + addonReq.getName()));
             int total = addon.getPrice() * addonReq.getQuantity();
             addonItems.add(new OrderAddonItem(null, null, addonReq.getName(), addon.getPrice(), addonReq.getQuantity(), total));
+
+            // ✅ 추가 상품 가격은 별도 합산
             addonTotal += total;
         }
 
+        // ✅ 총 결제 금액 = 옵션 포함 상품 총합 + 추가상품 총합
         int totalPrice = productTotal + addonTotal;
 
+        // ✅ 주문 저장 시 상품 정보 snapshot 저장
         Order order = new Order();
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus("PAID");
